@@ -16,6 +16,19 @@ export default function Home() {
     return savedEnergyCount ? JSON.parse(savedEnergyCount) : 1000;
   });
 
+  const [upgrades, setUpgrades] = useState(() => {
+    const savedUpgrades = localStorage.getItem('upgrades');
+    return savedUpgrades ? JSON.parse(savedUpgrades) : [];
+  });
+
+  const clickMultiplier = upgrades
+    .filter((u) => u.type === 'click')
+    .reduce((total, upgrade) => total + upgrade.profit, 1);
+
+  const passiveIncome = upgrades
+    .filter((u) => u.type === 'passive')
+    .reduce((total, upgrade) => total + upgrade.profit, 0);
+
   useEffect(() => {
     localStorage.setItem('coinCount', JSON.stringify(coinCount));
     localStorage.setItem('energyCount', JSON.stringify(energyCount));
@@ -23,8 +36,8 @@ export default function Home() {
 
   const handleCoinClick = () => {
     if (energyCount > 0) {
-      setCoinCount(coinCount + 1);
-      setEnergyCount(energyCount - 1);
+      setCoinCount((prev) => prev + clickMultiplier);
+      setEnergyCount((prev) => prev - 1);
     }
   };
 
@@ -40,9 +53,26 @@ export default function Home() {
     }
   }, [energyCount]);
 
+  useEffect(() => {
+    if (passiveIncome > 0) {
+      const hourlyIncome = passiveIncome;
+      const minuteIncome = hourlyIncome / 60;
+
+      const interval = setInterval(() => {
+        setCoinCount((prev) => prev + minuteIncome);
+      }, 60000);
+
+      return () => clearInterval(interval);
+    }
+  }, [upgrades, passiveIncome]);
+
   return (
     <div className="bg-gray-950 min-h-screen flex flex-col gap-5 items-center justify-center overflow-hidden font-unbounded">
-      <StatsBar />
+      <StatsBar
+        clickMultiplier={clickMultiplier}
+        coinCount={coinCount}
+        passiveIncome={passiveIncome}
+      />
       <CurrencyDisplay coinCount={coinCount} />
       <MainScreen onCoinClick={handleCoinClick} className="flex-grow" />
       <EnergyBar energyCount={energyCount} />
