@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { GameContext } from '../context/GameContext';
 import NavBar from '../components/NavBar';
 import calendar from '../images/calendar.svg';
 import mainCoin from '../images/main-coin.svg';
 
 export default function DailyBonus() {
+  const { coinCount, setCoinCount } = useContext(GameContext); // Отримуємо coinCount та setCoinCount з контексту
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dailyBonusData, setDailyBonusData] = useState(() => {
     const savedData = localStorage.getItem('dailyBonus');
@@ -42,25 +45,18 @@ export default function DailyBonus() {
     const newDay = (dailyBonusData.currentDay + 1) % bonusAmounts.length;
     const bonusAmount = bonusAmounts[newDay];
 
+    // Оновлюємо dailyBonusData
     setDailyBonusData({
       lastClaimedDate: today,
       currentDay: newDay,
       totalCoins: dailyBonusData.totalCoins + bonusAmount,
     });
 
-    setCoinCount((prev) => prev + bonusAmount);
+    // Оновлюємо глобальний coinCount через setCoinCount з контексту
+    setCoinCount((prev) => prev + bonusAmount); // Додаємо бонус до загального балансу монет
 
     closeModal();
   };
-
-  const [coinCount, setCoinCount] = useState(() => {
-    const savedCoinCount = localStorage.getItem('coinCount');
-    return savedCoinCount ? JSON.parse(savedCoinCount) : 0;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('coinCount', JSON.stringify(coinCount));
-  }, [coinCount]);
 
   const isBonusClaimedToday =
     dailyBonusData.lastClaimedDate === new Date().toISOString().split('T')[0];

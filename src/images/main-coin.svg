@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 512 512" xml:space="preserve">
+<svg height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 512 512" xmlSpace="preserve">
 <path style="fill:#FFCE2A;" d="M256,0l-20.898,256L256,512c141.385,0,256-114.615,256-256S397.385,0,256,0z"/>
 <path style="fill:#FDEB95;" d="M0,256c0,141.385,114.615,256,256,256V0C114.615,0,0,114.615,0,256z"/>
 <path style="fill:#FFAD00;" d="M256,53.897L235.102,256L256,458.103c111.44,0,202.103-90.663,202.103-202.103
