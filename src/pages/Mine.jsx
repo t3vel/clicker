@@ -1,46 +1,77 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { GameContext } from '../context/GameContext';
 import NavBar from '../components/NavBar';
 
 export default function Mine() {
-  const { coinCount, setCoinCount, upgrades, setUpgrades } =
-    useContext(GameContext);
+  const {
+    coinCount,
+    setCoinCount,
+    upgrades,
+    setUpgrades,
+    setTotalProfit,
+    clickMultiplier,
+    setClickMultiplier,
+  } = useContext(GameContext);
+
   const [activeUpgrade, setActiveUpgrade] = useState(null);
 
+  useEffect(() => {
+    console.log('Новий clickMultiplier:', clickMultiplier);
+  }, [clickMultiplier]);
+
   const handlePurchase = () => {
-    if (!activeUpgrade) return;
+    if (!activeUpgrade || coinCount < activeUpgrade.price) {
+      console.log('Not enough coins or no upgrade selected');
+      return;
+    }
 
-    if (coinCount >= activeUpgrade.price) {
-      setCoinCount(coinCount - activeUpgrade.price);
+    const previousClickMultiplier = clickMultiplier;
+    console.log('Revenue per click to purchase:', previousClickMultiplier);
 
-      console.log(`Перед оновленням:`, activeUpgrade);
-      console.log(
-        `Очікуваний приріст:`,
-        Math.round(activeUpgrade.profit * 1.5)
-      );
+    setCoinCount((prevCoinCount) => prevCoinCount - activeUpgrade.price);
 
-      const updatedUpgrades = upgrades.map((u) =>
+    setUpgrades((prevUpgrades) => {
+      const updatedUpgrades = prevUpgrades.map((u) =>
         u.id === activeUpgrade.id
           ? {
               ...u,
+              owned: true,
               level: u.level + 1,
               price: Math.round(u.price * 1.5),
-              profit: Math.round(u.profit * 1.5),
+              profit: u.baseProfit * (u.level + 1),
             }
           : u
       );
 
-      setUpgrades(updatedUpgrades);
-      setActiveUpgrade(null);
-    } else {
-      console.log('❌ Недостатньо монет!');
-    }
+      console.log('Updated upgrades:', updatedUpgrades);
+
+      const purchasedUpgrade = updatedUpgrades.find(
+        (u) => u.id === activeUpgrade.id
+      );
+
+      if (purchasedUpgrade.type === 'click') {
+        const newClickMultiplier =
+          previousClickMultiplier + purchasedUpgrade.profit;
+
+        setClickMultiplier(newClickMultiplier);
+      }
+
+      setTotalProfit((prevTotal) => {
+        const newTotal = prevTotal + purchasedUpgrade.profit;
+        console.log('New Total Profit:', newTotal);
+        return newTotal;
+      });
+
+      return updatedUpgrades;
+    });
+
+    setActiveUpgrade(null);
   };
 
   return (
     <div className="bg-gray-950 min-h-screen flex flex-col items-center justify-center font-unbounded">
       <h1 className="text-white text-2xl mb-4">
-        💰 Баланс: {parseInt(coinCount)}
+        💰 Balance: {parseInt(coinCount)}
       </h1>
 
       <div className="grid grid-cols-2 gap-6 p-6">
@@ -52,12 +83,13 @@ export default function Mine() {
           >
             <div className="text-4xl">{upgrade.img}</div>
             <h3 className="mt-2 font-bold">{upgrade.name}</h3>
-            <p className="text-sm">💰 Ціна: {upgrade.price}</p>
+            <p className="text-sm">💰 Price: {upgrade.price}</p>
             <p className="text-sm">
-              📈 +{parseInt(upgrade.profit / 2)} монет (
-              {upgrade.type === 'click' ? 'за клік' : 'пасивно'})
+              +{upgrade.baseProfit * (upgrade.level + 1)} coins (
+              {upgrade.type === 'click' ? 'by click' : 'passive'})
             </p>
-            <p className="text-sm">🔼 Рівень: {upgrade.level}</p>
+
+            <p className="text-sm">🔼 Lvl: {upgrade.level}</p>
           </button>
         ))}
       </div>
@@ -67,18 +99,20 @@ export default function Mine() {
           <div className="flex justify-between items-center">
             <div className="flex flex-col gap-4">
               <h3 className="text-2xl font-bold">{activeUpgrade.name}</h3>
-              <p>🏆 Поточний рівень: {activeUpgrade.level}</p>
+              <p>🏆 Current level: {activeUpgrade.level}</p>
               <p>
-                ⚡ Покращення: +{parseInt(activeUpgrade.profit / 2)} монет (
-                {activeUpgrade.type === 'click' ? 'за клік' : 'пасивно'})
+                ⚡ Improvement: +
+                {activeUpgrade.baseProfit * (activeUpgrade.level + 1)} coins (
+                {activeUpgrade.type === 'click' ? 'by click' : 'passive'})
               </p>
-              <p>💰 Ціна: {activeUpgrade.price} монет</p>
+
+              <p>💰 Price: {activeUpgrade.price} coins</p>
             </div>
             <button
               className="bg-red-500 text-white px-4 py-2 rounded-lg"
               onClick={() => setActiveUpgrade(null)}
             >
-              Закрити
+              Close
             </button>
           </div>
 
@@ -91,9 +125,7 @@ export default function Mine() {
             onClick={handlePurchase}
             disabled={coinCount < activeUpgrade.price}
           >
-            {coinCount >= activeUpgrade.price
-              ? 'Придбати'
-              : 'Недостатньо монет'}
+            {coinCount >= activeUpgrade.price ? 'Buy' : 'Not enought coins'}
           </button>
         </div>
       )}

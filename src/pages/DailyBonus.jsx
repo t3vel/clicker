@@ -5,7 +5,8 @@ import calendar from '../images/calendar.svg';
 import mainCoin from '../images/main-coin.svg';
 
 export default function DailyBonus() {
-  const { coinCount, setCoinCount } = useContext(GameContext); // Отримуємо coinCount та setCoinCount з контексту
+  const { coinCount, setCoinCount, totalCoinsEarned, setTotalCoinsEarned } =
+    useContext(GameContext); // Додано totalCoinsEarned і setTotalCoinsEarned
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dailyBonusData, setDailyBonusData] = useState(() => {
@@ -20,7 +21,7 @@ export default function DailyBonus() {
   });
 
   const bonusAmounts = [
-    1000, 1500, 1500, 2000, 2000, 2500, 2500, 3000, 3000, 6000,
+    1000, 1250, 1500, 2000, 2000, 2500, 2500, 3000, 3000, 6000,
   ];
 
   useEffect(() => {
@@ -42,18 +43,18 @@ export default function DailyBonus() {
       return;
     }
 
-    const newDay = (dailyBonusData.currentDay + 1) % bonusAmounts.length;
+    const newDay = dailyBonusData.currentDay;
     const bonusAmount = bonusAmounts[newDay];
 
-    // Оновлюємо dailyBonusData
     setDailyBonusData({
       lastClaimedDate: today,
-      currentDay: newDay,
+      currentDay: newDay < bonusAmounts.length - 1 ? newDay + 1 : newDay,
       totalCoins: dailyBonusData.totalCoins + bonusAmount,
     });
 
-    // Оновлюємо глобальний coinCount через setCoinCount з контексту
-    setCoinCount((prev) => prev + bonusAmount); // Додаємо бонус до загального балансу монет
+    // Оновлюємо totalCoinsEarned та coinCount
+    setCoinCount((prev) => prev + bonusAmount);
+    setTotalCoinsEarned((prev) => prev + bonusAmount); // Оновлення totalCoinsEarned
 
     closeModal();
   };

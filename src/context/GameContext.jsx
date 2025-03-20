@@ -11,60 +11,82 @@ export function GameProvider({ children }) {
     return parseInt(localStorage.getItem('energyCount')) || 1000;
   });
 
+  const [totalCoinsEarned, setTotalCoinsEarned] = useState(() => {
+    return parseInt(localStorage.getItem('totalCoinsEarned')) || 0;
+  });
+
+  const [totalProfit, setTotalProfit] = useState(0);
+
+  const [clickMultiplier, setClickMultiplier] = useState(() => {
+    return parseInt(localStorage.getItem('clickMultiplier')) || 1;
+  });
+
   const defaultUpgrades = [
     {
       id: 1,
       type: 'click',
-      name: 'Золотий Палець',
+      name: 'Golden Finger',
       price: 200,
+      baseProfit: 2,
       profit: 2,
       level: 1,
-      img: '🖕',
+      img: '💰',
+      owned: false,
     },
     {
       id: 2,
       type: 'click',
-      name: 'Кібер-Рука',
+      name: 'Cyber Hand',
       price: 1000,
+      baseProfit: 10,
       profit: 10,
       level: 1,
       img: '🦾',
+      owned: false,
     },
     {
       id: 3,
       type: 'click',
-      name: 'Божественний Клік',
+      name: 'Divine Click',
       price: 5000,
+      baseProfit: 50,
       profit: 50,
       level: 1,
       img: '⚡',
+      owned: false,
     },
     {
       id: 4,
       type: 'passive',
-      name: 'Клік-Менеджер',
+      name: 'Click Manager',
       price: 500,
-      profit: 100,
+      baseProfit: 50,
+      profit: 50,
       level: 1,
       img: '📊',
+      owned: false,
     },
     {
       id: 5,
       type: 'passive',
-      name: 'Автоклік-Ферма',
+      name: 'Auto-Click Farm',
       price: 5000,
+      baseProfit: 1000,
       profit: 1000,
       level: 1,
       img: '🏡',
+      owned: false,
     },
     {
       id: 6,
       type: 'passive',
-      name: 'Сервер Кліків',
+      name: 'Click Server',
       price: 25000,
+      baseProfit: 10000,
       profit: 10000,
       level: 1,
       img: '🌍',
+      owned: false,
     },
   ];
 
@@ -78,6 +100,15 @@ export function GameProvider({ children }) {
     }
   });
 
+  // Глобальне відновлення енергії кожні 3 секунди
+  useEffect(() => {
+    const energyRegenInterval = setInterval(() => {
+      setEnergyCount((prev) => Math.min(prev + 1, 1000)); // +1 енергія, не більше 1000
+    }, 3000);
+
+    return () => clearInterval(energyRegenInterval);
+  }, []);
+
   useEffect(() => {
     if (upgrades.length > 0) {
       localStorage.setItem('upgrades', JSON.stringify(upgrades));
@@ -87,7 +118,9 @@ export function GameProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('coinCount', coinCount);
     localStorage.setItem('energyCount', energyCount);
-  }, [coinCount, energyCount]);
+    localStorage.setItem('totalCoinsEarned', totalCoinsEarned);
+    localStorage.setItem('clickMultiplier', clickMultiplier);
+  }, [coinCount, energyCount, totalCoinsEarned, clickMultiplier]);
 
   return (
     <GameContext.Provider
@@ -98,6 +131,12 @@ export function GameProvider({ children }) {
         setEnergyCount,
         upgrades,
         setUpgrades,
+        totalProfit,
+        setTotalProfit,
+        clickMultiplier,
+        setClickMultiplier,
+        totalCoinsEarned,
+        setTotalCoinsEarned,
       }}
     >
       {children}

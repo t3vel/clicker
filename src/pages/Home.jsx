@@ -7,90 +7,81 @@ import MainScreen from '../components/MainScreen';
 import EnergyBar from '../components/EnergyBar';
 
 export default function Home() {
-  const { coinCount, setCoinCount, energyCount, setEnergyCount, upgrades } =
-    useContext(GameContext);
+  const {
+    coinCount,
+    setCoinCount,
+    energyCount,
+    setEnergyCount,
+    upgrades,
+    totalCoinsEarned,
+    setTotalCoinsEarned,
+    clickMultiplier,
+  } = useContext(GameContext);
 
-  useEffect(() => {
-    // Перевірка наявності збережених монет та енергії у localStorage
-    const savedCoinCount = localStorage.getItem('coinCount');
-    const savedEnergyCount = localStorage.getItem('energyCount');
-
-    if (savedCoinCount) {
-      setCoinCount(Number(savedCoinCount));
-    } else {
-      setCoinCount(0);
-    }
-
-    if (savedEnergyCount) {
-      setEnergyCount(Number(savedEnergyCount));
-    } else {
-      setEnergyCount(1000);
-    }
-  }, []); // Виконується тільки при першому завантаженні
-
-  const [clickMultiplier, setClickMultiplier] = useState(0);
   const [passiveIncome, setPassiveIncome] = useState(0);
 
   useEffect(() => {
-    // Обчислюємо множник кліка на основі кількості монет
-    const multiplier = Math.floor(coinCount / 1000) + 1; // Збільшуємо на 1 кожні 1000 монет
-    setClickMultiplier(multiplier);
-  }, [coinCount]);
+    const totalPassive = upgrades
+      .filter((upgrade) => upgrade.owned && upgrade.type === 'passive')
+      .reduce((total, upgrade) => total + upgrade.profit, 0);
+
+    setPassiveIncome(totalPassive);
+  }, [upgrades]);
 
   useEffect(() => {
-    // Якщо пасивний дохід більше нуля, то додаємо монети кожну хвилину
     if (passiveIncome > 0) {
-      const hourlyIncome = passiveIncome;
-      const minuteIncome = hourlyIncome / 60;
-
       const interval = setInterval(() => {
-        setCoinCount((prev) => prev + minuteIncome);
-      }, 60000);
+        setCoinCount((prev) => prev + passiveIncome / 60);
+        setTotalCoinsEarned((prev) => prev + passiveIncome / 60);
+      }, 6000);
 
-      return () => clearInterval(interval); // Очищаємо інтервал після зміни
+      return () => clearInterval(interval);
     }
-  }, [passiveIncome]); // Залежить від зміни `passiveIncome`
+  }, [passiveIncome]);
+
+  const handleCoinClick = () => {
+    if (energyCount > 0) {
+      setCoinCount((prev) => prev + clickMultiplier);
+      setTotalCoinsEarned((prev) => prev + clickMultiplier);
+      setEnergyCount((prev) => Math.max(prev - 1, 0));
+    }
+  };
+
+  const [level, setLevel] = useState(1);
 
   useEffect(() => {
-    // Обчислюємо загальний пасивний дохід з усіх оновлень
-    const totalPassiveIncome = upgrades.reduce((total, upgrade) => {
-      const profit = typeof upgrade.profit === 'number' ? upgrade.profit : 0;
-      return total + profit;
-    }, 0);
+    const newLevel = Math.floor(totalCoinsEarned / 500) + 1;
+    setLevel(newLevel);
+  }, [totalCoinsEarned]);
 
-    // Оновлюємо стан пасивного доходу
-    console.log('Total Passive Income:', totalPassiveIncome);
-    setPassiveIncome(totalPassiveIncome);
-  }, [upgrades]); // Викликається кожного разу, коли оновлюється `upgrades`
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
 
-  // Збереження значень у localStorage при їх оновленні
   useEffect(() => {
-    localStorage.setItem('coinCount', coinCount);
-    localStorage.setItem('energyCount', energyCount);
-  }, [coinCount, energyCount]);
-
-  console.log('Click Multiplier:', clickMultiplier);
-  console.log('Energy Count:', energyCount);
+    const newLevel = Math.floor(totalCoinsEarned / 500) + 1;
+    if (newLevel > level) {
+      setShowLevelUpModal(true);
+      setTimeout(() => {
+        setShowLevelUpModal(false);
+      }, 3000);
+    }
+    setLevel(newLevel);
+  }, [totalCoinsEarned]);
 
   return (
     <div className="bg-gray-950 min-h-screen flex flex-col gap-5 items-center justify-center overflow-hidden font-unbounded">
+      {showLevelUpModal && (
+        <div className="fixed top-4 left-2 bg-green-500 text-white py-2 text-center text-sm p-3">
+          You have reached a new level!
+        </div>
+      )}
       <StatsBar
         clickMultiplier={clickMultiplier}
         coinCount={coinCount}
         passiveIncome={passiveIncome}
+        totalCoinsEarned={totalCoinsEarned}
       />
       <CurrencyDisplay coinCount={coinCount} />
-      <MainScreen
-        onCoinClick={() => {
-          // Перевірка чи достатньо енергії для кліка
-          if (energyCount > 0) {
-            setCoinCount((prev) => prev + clickMultiplier);
-            setEnergyCount((prev) => Math.max(prev - 1, 0)); // Зберігаємо енергію не менше 0
-          }
-        }}
-        className="flex-grow"
-      />
-
+      <MainScreen onCoinClick={handleCoinClick} className="flex-grow" />
       <EnergyBar energyCount={energyCount} />
       <NavBar />
     </div>

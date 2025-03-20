@@ -2,12 +2,12 @@ import React from 'react';
 
 export default function StatsBar({
   clickMultiplier,
-  coinCount,
   passiveIncome,
+  totalCoinsEarned,
 }) {
-  const validCoinCount = Number(coinCount) || 0;
+  const validTotalCoinsEarned = Number(totalCoinsEarned) || 0;
 
-  const coinsToLevelUp = Math.floor(validCoinCount / 500) * 500 + 500;
+  const coinsToLevelUp = Math.ceil((validTotalCoinsEarned + 1) / 500) * 500;
 
   return (
     <div className="bg-gray-800 text-white p-4 rounded-xl shadow-md w-full max-w-sm mx-auto">
@@ -18,7 +18,9 @@ export default function StatsBar({
         </li>
         <li className="flex justify-between border-b border-gray-600 pb-1">
           <span>Coins to LVL up:</span>
-          <span className="font-bold text-yellow-400">{coinsToLevelUp}</span>
+          <span className="font-bold text-yellow-400">
+            {parseInt(coinsToLevelUp - validTotalCoinsEarned)}
+          </span>
         </li>
         <li className="flex justify-between">
           <span>Profit per hour:</span>
