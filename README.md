@@ -1,4 +1,4 @@
-# Coin Clicker Game
+# 💸 Coin Clicker Game 💸
 
 **Coin Clicker Game** – це клікер-гра, де користувачі натискають на монети, щоб заробити більше і покращити свій прогрес. Гра включає систему зберігання даних в локальному сховищі, різні покращення, пасивні покращення, бонуси щоденного входу, адаптацію під всі пристрої та маршрутизацію через React Router.
 
@@ -41,7 +41,7 @@ git clone https://github.com/t3vel/clicker.git
    ``` 
 ---
 
-# Coin Clicker Game
+# 💸 Coin Clicker Game 💸
 
 **Coin Clicker Game** is an idle-clicker game where users click on coins to earn more and improve their progress. The game includes a local storage system, various upgrades, passive upgrades, daily login bonuses, full responsiveness, and routing through React Router.
 
