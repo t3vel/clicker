@@ -100,7 +100,6 @@ export function GameProvider({ children }) {
     }
   });
 
-  // Глобальне відновлення енергії кожні 3 секунди
   useEffect(() => {
     const energyRegenInterval = setInterval(() => {
       setEnergyCount((prev) => Math.min(prev + 1, 1000)); // +1 енергія, не більше 1000

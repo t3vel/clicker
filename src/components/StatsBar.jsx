@@ -10,7 +10,7 @@ export default function StatsBar({
   const coinsToLevelUp = Math.ceil((validTotalCoinsEarned + 1) / 500) * 500;
 
   return (
-    <div className="bg-gray-800 text-white p-4 rounded-xl shadow-md w-full max-w-sm mx-auto">
+    <div className="bg-gray-800 text-white p-4 rounded-xl shadow-md w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto">
       <ul className="space-y-2">
         <li className="flex justify-between border-b border-gray-600 pb-1">
           <span>Earn per tap:</span>
@@ -26,7 +26,7 @@ export default function StatsBar({
           <span>Profit per hour:</span>
           <span className="font-bold text-blue-400">{passiveIncome}</span>
         </li>
-      </ul>
+      </ul> 
     </div>
   );
 }

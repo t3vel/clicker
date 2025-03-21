@@ -6,7 +6,7 @@ import mainCoin from '../images/main-coin.svg';
 
 export default function DailyBonus() {
   const { coinCount, setCoinCount, totalCoinsEarned, setTotalCoinsEarned } =
-    useContext(GameContext); // Додано totalCoinsEarned і setTotalCoinsEarned
+    useContext(GameContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dailyBonusData, setDailyBonusData] = useState(() => {
@@ -52,9 +52,8 @@ export default function DailyBonus() {
       totalCoins: dailyBonusData.totalCoins + bonusAmount,
     });
 
-    // Оновлюємо totalCoinsEarned та coinCount
     setCoinCount((prev) => prev + bonusAmount);
-    setTotalCoinsEarned((prev) => prev + bonusAmount); // Оновлення totalCoinsEarned
+    setTotalCoinsEarned((prev) => prev + bonusAmount);
 
     closeModal();
   };
@@ -64,7 +63,7 @@ export default function DailyBonus() {
 
   return (
     <div className="bg-gray-950 min-h-screen flex flex-col gap-5 items-center justify-center overflow-hidden font-unbounded">
-      <h1 className="text-white text-5xl mb-4">Earn more money</h1>
+      <h1 className="text-white text-5xl mb-4 text-center">Earn more money</h1>
       <div
         onClick={openModal}
         className="text-white border border-x-slate-400 rounded-xl py-3 px-8 flex flex-col items-center gap-2 cursor-pointer"
