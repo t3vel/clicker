@@ -16,6 +16,8 @@ export default function Home() {
     totalCoinsEarned,
     setTotalCoinsEarned,
     clickMultiplier,
+    level,
+    setLevel,
   } = useContext(GameContext);
 
   const [passiveIncome, setPassiveIncome] = useState(0);
@@ -48,13 +50,6 @@ export default function Home() {
     }
   };
 
-  const [level, setLevel] = useState(1);
-
-  useEffect(() => {
-    const newLevel = Math.floor(totalCoinsEarned / 500) + 1;
-    setLevel(newLevel);
-  }, [totalCoinsEarned]);
-
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
 
   useEffect(() => {
@@ -72,7 +67,7 @@ export default function Home() {
     <div className="bg-gray-950 min-h-screen flex flex-col gap-5 items-center justify-center overflow-hidden font-unbounded">
       {showLevelUpModal && (
         <div className="fixed top-2 left-2 bg-green-500 text-white py-2 text-center text-xs sm:text-sm p-3 w-9/12 sm:w-auto rounded-lg shadow-lg z-50">
-          You have reached a new level! 
+          You have reached a new level!
         </div>
       )}
       <StatsBar

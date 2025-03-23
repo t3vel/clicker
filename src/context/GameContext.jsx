@@ -21,6 +21,13 @@ export function GameProvider({ children }) {
     return parseInt(localStorage.getItem('clickMultiplier')) || 1;
   });
 
+  const [level, setLevel] = useState(1);
+
+  useEffect(() => {
+    const newLevel = Math.floor(totalCoinsEarned / 500) + 1;
+    setLevel(newLevel);
+  }, [totalCoinsEarned]);
+
   const defaultUpgrades = [
     {
       id: 1,
@@ -100,6 +107,20 @@ export function GameProvider({ children }) {
     }
   });
 
+  const [totalTaps, setTotalTaps] = useState(() => {
+    return parseInt(localStorage.getItem('totalTaps')) || 0;
+  });
+
+  // Оновлення totalTaps при кліках (наприклад, при заробітку монет)
+  const incrementTaps = () => {
+    setTotalTaps((prev) => prev + 1);
+  };
+
+  // Збереження totalTaps у локальному сховищі
+  useEffect(() => {
+    localStorage.setItem('totalTaps', totalTaps);
+  }, [totalTaps]);
+
   useEffect(() => {
     const energyRegenInterval = setInterval(() => {
       setEnergyCount((prev) => Math.min(prev + 1, 1000)); // +1 енергія, не більше 1000
@@ -136,6 +157,10 @@ export function GameProvider({ children }) {
         setClickMultiplier,
         totalCoinsEarned,
         setTotalCoinsEarned,
+        level,
+        setLevel,
+        incrementTaps,
+        totalTaps,
       }}
     >
       {children}
