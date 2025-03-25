@@ -135,7 +135,9 @@ export default function DailyBonus() {
         </div>
       )}
 
-      <NavBar />
+      <div className="">
+        <NavBar />
+      </div>
     </div>
   );
 }

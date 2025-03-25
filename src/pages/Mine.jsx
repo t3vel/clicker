@@ -142,8 +142,9 @@ export default function Mine() {
           </button>
         </div>
       )}
-
-      <NavBar />
+      <div className="">
+        <NavBar />
+      </div>
     </div>
   );
 }

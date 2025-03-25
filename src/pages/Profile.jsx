@@ -3,8 +3,14 @@ import NavBar from '../components/NavBar';
 import { GameContext } from '../context/GameContext';
 
 export default function Profile() {
-  const { level, totalCoinsEarned, totalTaps, energyCount, upgrades } =
-    useContext(GameContext);
+  const {
+    level,
+    totalCoinsEarned,
+    totalTaps,
+    energyCount,
+    upgrades,
+    passiveIncome,
+  } = useContext(GameContext);
 
   const [nickname, setNickname] = useState(
     () => localStorage.getItem('nickname') || 'user'
@@ -32,10 +38,49 @@ export default function Profile() {
     {
       id: 4,
       name: '100 energy spent ⚡',
-      condition: energyCount <= 900,
+      condition: totalTaps >= 100,
+      unlocked: false,
+    },
+    {
+      id: 5,
+      name: 'Millionaire 💎',
+      condition: totalCoinsEarned >= 1000000,
+      unlocked: false,
+    },
+    {
+      id: 6,
+      name: '5000 taps in total 🖱️',
+      condition: totalTaps >= 5000,
+      unlocked: false,
+    },
+
+    {
+      id: 7,
+      name: 'Investor 📈',
+      condition: upgrades.filter((upg) => upg.owned).length >= 10,
+      unlocked: false,
+    },
+    {
+      id: 9,
+      name: 'Passive Income Earner 🏦',
+      condition: passiveIncome >= 5000,
+      unlocked: false,
+    },
+    {
+      id: 11,
+      name: 'Level 100 Reached 🚀',
+      condition: level >= 10,
       unlocked: false,
     },
   ]);
+
+  const getRank = (level) => {
+    if (level <= 10) return 'Newcomer';
+    if (level <= 25) return 'Beginner';
+    if (level <= 50) return 'Experienced';
+    if (level <= 200) return 'Professional';
+    return 'Master';
+  };
 
   useEffect(() => {
     const savedAchievements = localStorage.getItem('achievements');
@@ -52,7 +97,7 @@ export default function Profile() {
       if (achievement.id === 2) isUnlocked = totalTaps >= 1000;
       if (achievement.id === 3)
         isUnlocked = upgrades.filter((upg) => upg.owned).length >= 1;
-      if (achievement.id === 4) isUnlocked = energyCount <= 900;
+      if (achievement.id === 4) isUnlocked = totalTaps >= 100;
 
       return {
         ...achievement,
@@ -111,17 +156,24 @@ export default function Profile() {
             Total number of taps:{' '}
             <span className="text-yellow-400">{totalTaps}</span>
           </p>
+          <p>
+            Rank: <span className="text-purple-400">{getRank(level)}</span>
+          </p>
         </div>
         {/* Досягнення */}
-        <div className="bg-gray-800 p-4 rounded-xl shadow-md w-64">
+        <div className="bg-gray-800 p-4 rounded-xl shadow-md w-64 max-h-48 overflow-y-auto scrollbar scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700">
           <h3 className="text-lg mb-3">Achievement</h3>
-          <ul className="list-none list-inside text-gray-300">
-            {achievements.map((achievement) => (
+          <ul className="list-none list-inside text-gray-300 w-full">
+            {achievements.map((achievement, index) => (
               <li
                 key={achievement.id}
-                className={
+                className={`py-2 px-1 ${
                   achievement.unlocked ? 'text-green-400' : 'text-gray-400'
-                }
+                } ${
+                  index !== achievements.length - 1
+                    ? 'border-b border-gray-600'
+                    : ''
+                }`}
               >
                 {achievement.name}
               </li>

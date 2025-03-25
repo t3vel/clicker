@@ -26,7 +26,7 @@ export default function StatsBar({
           <span>Profit per hour:</span>
           <span className="font-bold text-blue-400">{passiveIncome}</span>
         </li>
-      </ul> 
+      </ul>
     </div>
   );
 }
